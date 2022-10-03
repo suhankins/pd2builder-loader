@@ -32,6 +32,10 @@ if not BuilderLoader then
     --[1] - basic 
     --[2] - aced
     BuilderLoader.colors = {Color(0.2, 0.2, 0.2), Color.white, Color(46 / 255, 140 / 255, 187 / 255)}
+    BuilderLoader.colors_unlocked = {
+        [true] = Color.yellow,
+        [false] = Color.red
+    }
 
     BuilderLoader.skill_names = {
         {{"combat_medic"}, {"fast_learner","tea_time"}, {"medic_2x","tea_cookies"}, {"inspire"}}, --medic
@@ -401,17 +405,17 @@ if not BuilderLoader then
         if (self.deployable) then
             local newDeployable = {}
             for slot = 1,#self.deployable,1 do
-                table.insert(newDeployable, BuilderLoader:get_byte(string.sub(self.deployable,slot,slot)) + 1)
+                table.insert(newDeployable, self:get_byte(string.sub(self.deployable,slot,slot)) + 1)
             end
             self.deployable = newDeployable
         end
     end
 
     function BuilderLoader:upload_build()
-        BuilderLoader:_load_skills_from_from_player()
+        self:_load_skills_from_from_player()
         local skills = nil
-        if not BuilderLoader:is_skills_empty() then
-            skills = BuilderLoader:_compress_skills(BuilderLoader:_convert_skills())
+        if not self:is_skills_empty() then
+            skills = self:_compress_skills(self:_convert_skills())
         end
 
         local result = self.link_to_pd2builder
@@ -421,26 +425,26 @@ if not BuilderLoader then
             result = result .. "s=" .. skills
         end
         --Perk deck
-        result = result .. "&p=" .. BuilderLoader:get_byte(managers.skilltree:get_specialization_value("current_specialization") - 1)
+        result = result .. "&p=" .. self:get_byte(managers.skilltree:get_specialization_value("current_specialization") - 1)
         --Armor
-        result = result .. "&a=" .. BuilderLoader:get_byte(BuilderLoader:get_byte(managers.blackmarket:equipped_armor():gsub("level_","")) - 1)
+        result = result .. "&a=" .. self:get_byte(self:get_byte(managers.blackmarket:equipped_armor():gsub("level_","")) - 1)
         --Throwable
         if (managers.blackmarket:equipped_grenade() ~= "none") then
             for i = 1,#BuilderLoader.grenades,1 do
                 if BuilderLoader.grenades[i] == managers.blackmarket:equipped_grenade() then
-                    result = result .. "&t=" .. BuilderLoader:get_byte(i - 1)
+                    result = result .. "&t=" .. self:get_byte(i - 1)
                 end
             end
         end
         --Deployable
         for slot = 1,2,1 do
             if (managers.blackmarket:equipped_deployable(slot) ~= "none") then
-                for i = 1,#BuilderLoader.deployables,1 do
-                    if BuilderLoader.deployables[i] == managers.blackmarket:equipped_deployable(slot) then
+                for i = 1,#self.deployables,1 do
+                    if self.deployables[i] == managers.blackmarket:equipped_deployable(slot) then
                         if (slot == 1) then
                             result = result .. "&d="
                         end
-                        result = result .. BuilderLoader:get_byte(i - 1)
+                        result = result .. self:get_byte(i - 1)
                     end
                 end
             end
@@ -449,20 +453,20 @@ if not BuilderLoader then
     end
 
     function BuilderLoader:set_build()
-        BuilderLoader:_set_perkdeck()
-        BuilderLoader:_set_armor()
-        BuilderLoader:_set_grenade()
-        BuilderLoader:_set_deployable()
-        BuilderLoader:_set_skills()
+        self:_set_perkdeck()
+        self:_set_armor()
+        self:_set_grenade()
+        self:_set_deployable()
+        self:_set_skills()
     end
 
     function BuilderLoader:get_perkdeck_string()
-        local perkdeck_name = tweak_data.skilltree.specializations[managers.skilltree:digest_value(BuilderLoader.perkdeck, false)]
+        local perkdeck_name = tweak_data.skilltree.specializations[managers.skilltree:digest_value(self.perkdeck, false)]
         return managers.localization:text("menu_specialization") .. ": ##" .. managers.localization:text(perkdeck_name.name_id) .. "##"
     end
 
     function BuilderLoader:get_armor_string()
-        return managers.localization:text("bm_menu_armors") .. ": ##" .. managers.localization:text(tweak_data.blackmarket.armors["level_" .. BuilderLoader.armor].name_id) .. "##"
+        return managers.localization:text("bm_menu_armors") .. ": ##" .. managers.localization:text(tweak_data.blackmarket.armors["level_" .. self.armor].name_id) .. "##"
     end
 
     function BuilderLoader:get_deployable_string()
@@ -471,13 +475,25 @@ if not BuilderLoader then
             if (i > 1) then
                 toReturn = toReturn .. " & "
             end
-            toReturn = toReturn .. managers.localization:text(tweak_data.upgrades.definitions[BuilderLoader.deployables[BuilderLoader.deployable[i]]].name_id)
+            toReturn = toReturn .. managers.localization:text(tweak_data.upgrades.definitions[self.deployables[self.deployable[i]]].name_id)
         end
         toReturn = toReturn .. "##"
         return toReturn
     end
 
     function BuilderLoader:get_grenade_string()
-        return managers.localization:text("bm_menu_grenades") .. ": ##" .. managers.localization:text(tweak_data.blackmarket.projectiles[BuilderLoader.grenades[BuilderLoader.grenade]].name_id) .. "##"
+        return managers.localization:text("bm_menu_grenades") .. ": ##" .. managers.localization:text(tweak_data.blackmarket.projectiles[self.grenades[self.grenade]].name_id) .. "##"
+    end
+
+    function BuilderLoader:is_grenade_unlocked()
+        return Global.blackmarket_manager.grenades[self.grenades[self.grenade]].unlocked
+    end
+
+    function BuilderLoader:is_perkdeck_unlocked()
+        local spec_data = tweak_data.skilltree.specializations[managers.skilltree:digest_value(self.perkdeck, false)]
+        if not spec_data.dlc then
+            return true
+        end
+        return managers.dlc:is_dlc_unlocked(spec_data.dlc) ~= nil
     end
 end

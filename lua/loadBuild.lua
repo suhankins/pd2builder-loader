@@ -18,8 +18,7 @@ if (not BuilderLoader:is_skills_empty()) then
         --near technician we display other stuff about your build
         if (i == 3 and BuilderLoader.perkdeck) then
             text = text .. BuilderLoader:get_perkdeck_string()
-            --TODO: color it depending on if it's available or not
-            table.insert(text_formating_color_table, Color.yellow)
+            table.insert(text_formating_color_table, BuilderLoader.colors_unlocked[BuilderLoader:is_perkdeck_unlocked()])
         end
         text = text .. "\n"
         --3 and 2 tier skills
@@ -33,7 +32,7 @@ if (not BuilderLoader:is_skills_empty()) then
                     BuilderLoader.subtrees[(i - 1) * 3 + math.floor((j - 1) / 2) + 1][4 - k][math.fmod(j,2) + 1] + 1
                 ])
             end
-            --near technician we display other stuff about your build
+            --near technician we display armor and deployable
             if (i == 3) then
                 if (k == 1 and BuilderLoader.armor) then
                     text = text .. " " .. BuilderLoader:get_armor_string()
@@ -54,15 +53,14 @@ if (not BuilderLoader:is_skills_empty()) then
         --near technician we display other stuff about your build
         if (i == 3 and BuilderLoader.grenade) then
             text = text .. BuilderLoader:get_grenade_string()
-            --TODO: color it depending on if it's available or not
-            table.insert(text_formating_color_table, Color.yellow)
+            table.insert(text_formating_color_table, BuilderLoader.colors_unlocked[BuilderLoader:is_grenade_unlocked()])
         end
         text = text .. "\n"
     end
 else
     if (BuilderLoader.perkdeck) then
         text = text .. BuilderLoader:get_perkdeck_string() .. "\n"
-        table.insert(text_formating_color_table, Color.yellow)
+        table.insert(text_formating_color_table, BuilderLoader.colors_unlocked[BuilderLoader:is_perkdeck_unlocked()])
     end
     if (BuilderLoader.armor) then
         text = text .. BuilderLoader:get_armor_string() .. "\n"
@@ -74,7 +72,7 @@ else
     end
     if (BuilderLoader.grenade) then
         text = text .. BuilderLoader:get_grenade_string()
-        table.insert(text_formating_color_table, Color.yellow)
+        table.insert(text_formating_color_table, BuilderLoader.colors_unlocked[BuilderLoader:is_grenade_unlocked()])
     end
 end
 

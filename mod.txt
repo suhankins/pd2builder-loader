@@ -1,0 +1,29 @@
+{
+    "name" : "PD2Builder loader",
+    "description" : "Load and save builds in PD2Builder link format",
+    "author" : "Punished Bernadetta",
+    "version" : "beta3.2",
+    "image" : "assets/icon.texture",
+	"color" : "0.1 0.6 1",
+    "hooks" : [
+		{"script_path": "lua/builderLoader.lua", "hook_id": "lib/setups/setup"}
+	],
+    "keybinds" : [
+        {
+            "keybind_id" : "loadBuildFromLink",
+            "name" : "Import build",
+            "description" : "Imports from link in clipboard",
+            "script_path" : "lua/loadBuild.lua",
+            "run_in_menu" : true,
+            "localized" : false
+        },
+        {
+            "keybind_id" : "uploadBuildToLink",
+            "name" : "Export build",
+            "description" : "Exports your build to PD2Builder link",
+            "script_path" : "lua/uploadBuild.lua",
+            "run_in_menu" : true,
+            "localized" : false
+        }
+    ]
+}

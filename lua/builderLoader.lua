@@ -453,11 +453,11 @@ if not BuilderLoader then
     end
 
     function BuilderLoader:set_build()
-        self:_set_perkdeck()
-        self:_set_armor()
-        self:_set_grenade()
-        self:_set_deployable()
-        self:_set_skills()
+        BuilderLoader:_set_perkdeck()
+        BuilderLoader:_set_armor()
+        BuilderLoader:_set_grenade()
+        BuilderLoader:_set_deployable()
+        BuilderLoader:_set_skills()
     end
 
     function BuilderLoader:get_perkdeck_string()

@@ -255,10 +255,16 @@ if not BuilderLoader then
         local decompressed = ""
         local i = 0
         while i <= #data do
+            -- Strings are compressed like this:
+            -- X-Y
+            -- Where X is character to be repeated, 
+            -- - is symbol that character needs to be repeated,
+            -- and Y is how many times it should be repeated
             if string.sub(data, i + 1, i + 1) == "-" then
                 decompressed = decompressed .. string.rep(string.sub(data, i, i), string.sub(data, i + 2, i + 2))
                 i = i + 2
             else
+                -- If next symbol is not -, then this symbol goes as-is
                 decompressed = decompressed .. string.sub(data, i, i)
             end
             i = i + 1
@@ -393,6 +399,9 @@ if not BuilderLoader then
     end
 
     function BuilderLoader:load_build(text)
+        -- URLs can't have commas and @s, but they *are* in our base65 table so we must parse them too
+        text = text:gsub("%%2C", ","):gsub("%%40", "@") -- we use %% because % is used for capture groups
+
         BuilderLoader:_load_skills_from_text(text)
         self.grenade = BuilderLoader:get_byte(BuilderLoader:_get_raw(text, "t"))
         self.perkdeck = BuilderLoader:get_byte(BuilderLoader:_get_raw(text, "p"))

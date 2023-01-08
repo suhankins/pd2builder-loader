@@ -2,7 +2,7 @@
     "name" : "PD2Builder loader",
     "description" : "Load and save builds in PD2Builder link format",
     "author" : "Punished Bernadetta",
-    "version" : "beta3.4",
+    "version" : "beta3.5",
     "image" : "assets/icon.texture",
 	"color" : "0.1 0.6 1",
     "hooks" : [
